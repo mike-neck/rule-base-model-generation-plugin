@@ -1,3 +1,8 @@
+# Java files
+*.class
+*.jar
+
+# gradle files
 .gradle
 build/
 
@@ -5,7 +10,7 @@ build/
 gradle-app.setting
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
-!gradle-wrapper.jar
+!gradle/wrapper/*.jar
 
 # JetBrains files
 *.iml
@@ -22,6 +27,3 @@ out/
 # vim
 *~
 
-# Java
-*.class
-*.jar
