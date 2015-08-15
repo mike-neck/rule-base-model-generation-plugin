@@ -12,7 +12,7 @@ Copy & paste this snipet into your `build.gradle`.
 
 ```groovy
 plugins {
-    id 'rule-base-model-generation' version '0.1'
+    id 'org.mikeneck.rule-based-model-generation' version '0.1'
 }
 ```
 
