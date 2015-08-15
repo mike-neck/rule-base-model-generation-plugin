@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-apply plugin: 'groovy'
-apply plugin: 'idea'
+plugins {
+    id 'groovy'
+    id 'idea'
+    id 'com.gradle.plugin-publish' version '0.9.1'
+}
 
 ext {
     jdkLevel = 1.8
@@ -22,6 +25,7 @@ ext {
 }
 
 version = '0.1'
+group = 'org.mikeneck.gradle.plugin'
 
 repositories {
     mavenCentral()
@@ -46,3 +50,15 @@ idea {
     }
 }
 
+pluginBundle {
+    website = 'https://github.com/mike-neck/rule-base-model-generation-plugin'
+    vcsUrl = 'https://github.com/mike-neck/rule-base-model-generation-plugin'
+    description = 'This is plugin for Gradle, which generates interfaces for rule base model.'
+    plugins {
+        ruleBaseModelGeneration {
+            id = 'org.mikeneck.rule-based-model-generation'
+            displayName = 'Rule Base Model Generation Plugin'
+            tags = ['rule-based-model-configuration']
+        }
+    }
+}
