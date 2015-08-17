@@ -77,7 +77,7 @@ class PluginSpec extends Specification {
         when:
         def result = GradleRunner.create()
                 .withProjectDir(project.root)
-                .withArguments(ModelGeneration.TASK_NAME)
+                .withArguments(Tasks.GENERATE_INTERFACE.getTaskName())
                 .buildAndFail()
 
         then:
@@ -127,7 +127,7 @@ class PluginSpec extends Specification {
         when:
         def result = GradleRunner.create()
                 .withProjectDir(project.root)
-                .withArguments(ModelGeneration.TASK_NAME)
+                .withArguments(Tasks.GENERATE_INTERFACE.getTaskName())
                 .build()
 
         then:

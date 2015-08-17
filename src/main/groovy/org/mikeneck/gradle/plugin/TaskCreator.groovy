@@ -16,25 +16,10 @@
 package org.mikeneck.gradle.plugin
 
 import org.gradle.api.Task
-import org.gradle.model.Model
 import org.gradle.model.ModelMap
-import org.gradle.model.Mutate
-import org.gradle.model.RuleSource
 import org.mikeneck.gradle.plugin.model.ManagedModel
 
-class ModelGeneration extends RuleSource {
+interface TaskCreator {
 
-    public static final String TASK_NAME = 'generateModels'
-
-    @Model
-    public static void metaModel(ManagedModel model) {
-        model.srcDir = 'src/main/java'
-    }
-
-    @Mutate
-    public static void createTask(ModelMap<Task> tasks, ManagedModel model) {
-        Tasks.values().each {
-            it.createTask(tasks, model)
-        }
-    }
+    void createTask(ModelMap<Task> tasks, ManagedModel model)
 }
