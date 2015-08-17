@@ -81,10 +81,15 @@ class FieldObject {
     }
 
     String getPublicSetter() {
-        """|    @Override
-           |    public void set${this.camelName}(${this.typeDeclaration} ${entry.name}) {
+        def override = isSetterRequired() ? "    @Override\n" : ''
+        """|${override}    public void set${this.camelName}(${this.typeDeclaration} ${entry.name}) {
            |        this.${entry.name} = ${entry.name};
            |    }
+           |""".stripMargin()
+    }
+
+    String getField() {
+        """|    private ${typeDeclaration} ${entry.name};
            |""".stripMargin()
     }
 }

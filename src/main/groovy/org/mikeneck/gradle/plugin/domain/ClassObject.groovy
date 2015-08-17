@@ -52,11 +52,27 @@ class ClassObject {
     }
 
     /**
+     * Returns Pojo file name.
+     * @return Pojo file name.
+     */
+    String getPojoName() {
+        "${klass.name}Pojo.java"
+    }
+
+    /**
      * Returns Java file path.
      * @return Java file path.
      */
     String getJavaFilePath() {
         "${model.sourceDir}/${this.javaName}"
+    }
+
+    /**
+     * Returns Pojo file path.
+     * @return Pojo file path.
+     */
+    String getPojoFilePath() {
+        "${model.sourceDir}/${this.pojoName}"
     }
 
     /**
@@ -94,6 +110,33 @@ class ClassObject {
     }
 
     /**
+     * Returns getter/setter implementations.
+     * @return getter/setter implementations.
+     */
+    List<String> getAccessorImpl() {
+        isEnumType() ?
+                Collections.emptyList() :
+                klass.fields.collect {
+                    new FieldObject(it, model.definedTypes)
+                }.collect {
+                    if (it.unableToGenerateAccessors) {
+                        throw new IllegalArgumentException(it.exceptionMessage(klass.name))
+                    }
+                    [it.publicGetter, it.publicSetter]
+                }.flatten()
+    }
+
+    List<String> getPrivateFields() {
+        isEnumType() ?
+                Collections.emptyList():
+                klass.fields.collect {
+                    new FieldObject(it, model.definedTypes)
+                }.collect {
+                    it.field
+                }
+    }
+
+    /**
      * Returns Java interface file contents
      * @return interface file contents
      */
@@ -105,6 +148,18 @@ class ClassObject {
            |public ${klass.type.identifier} ${klass.name} {
            |
            |${this.entries.collect {it.size() == 0 ? '' : "    ${it}"}.join(this.enumType ? ',\n' : '\n')}
+           |}""".stripMargin()
+    }
+
+    String getPojoFileContents() {
+        """|package ${model.packageName};
+           |
+           |${this.imports.join('\\n')}
+           |
+           |public class ${klass.name}Pojo {
+           |
+           |${this.privateFields.join('\n')}
+           |${this.accessorImpl.join('\n')}
            |}""".stripMargin()
     }
 }

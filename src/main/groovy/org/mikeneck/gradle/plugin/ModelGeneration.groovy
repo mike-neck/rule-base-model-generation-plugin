@@ -24,7 +24,7 @@ import org.mikeneck.gradle.plugin.model.ManagedModel
 
 class ModelGeneration extends RuleSource {
 
-    public static final String TASK_NAME = 'generateModels'
+    public static final String GROUP_NAME = 'Meta Model Generation'
 
     @Model
     public static void metaModel(ManagedModel model) {

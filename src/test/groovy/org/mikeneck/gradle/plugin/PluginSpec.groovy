@@ -20,6 +20,7 @@ import com.github.javaparser.ParseException
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
+import org.mikeneck.gradle.plugin.test.support.FieldVisitor
 import org.mikeneck.gradle.plugin.test.support.TemporaryProject
 import spock.lang.Specification
 
@@ -132,7 +133,7 @@ class PluginSpec extends Specification {
 
         then:
         result.standardOutput.contains('BUILD SUCCESS')
-        result.task(":${ModelGeneration.TASK_NAME}").outcome == TaskOutcome.SUCCESS
+        result.task(":${Tasks.GENERATE_INTERFACE.getTaskName()}").outcome == TaskOutcome.SUCCESS
 
         when:
         def person = project.root.toPath().resolve("src/main/java/gradle/meta/model/Person.java")
@@ -153,5 +154,73 @@ class PluginSpec extends Specification {
 
         then:
         notThrown(ParseException)
+    }
+
+    def 'When run task[generatePojos], task[generateModels] will be executed and Pojo file will be generated'() {
+        given:
+        def script = """|apply plugin: 'org.mikeneck.rule-based-model-generation'
+                |
+                |model {
+                |    metaModel {
+                |        srcDir = 'src/main/java'
+                |        packageName = 'gradle.meta.model'
+                |        classes.create {
+                |            name = 'Person'
+                |            type = INTERFACE
+                |            fields.create {
+                |                name = 'name'
+                |                type = STRING
+                |            }
+                |            fields.create {
+                |                name = 'favorites'
+                |                type = ENUM
+                |                refType = 'Favorite'
+                |            }
+                |        }
+                |        classes.create {
+                |            name = 'Favorite'
+                |            type = ENUM
+                |            values.create {
+                |                value = 'GAME'
+                |            }
+                |            values.create {
+                |                value = 'READING_BOOK'
+                |            }
+                |        }
+                |    }
+                |}
+                |""".stripMargin()
+        project.buildGradle(script)
+
+        when:
+        def result = GradleRunner.create()
+                .withProjectDir(project.root)
+                .withArguments(Tasks.GENERATE_POJO.getTaskName())
+                .build()
+
+        then:
+        result.task(":${Tasks.GENERATE_INTERFACE.getTaskName()}").outcome == TaskOutcome.SUCCESS
+
+        when:
+        def person = project.root.toPath().resolve("src/main/java/gradle/meta/model/PersonPojo.java")
+        def favorite = project.root.toPath().resolve('src/main/java/gradle/meta/model/FavoritePojo.java')
+
+        then:
+        Files.exists(person)
+        !Files.exists(favorite)
+
+        when:
+        def unit = JavaParser.parse(person.toFile())
+
+        then:
+        notThrown(ParseException)
+
+        when:
+        def visitor = new FieldVisitor()
+        visitor.visit(unit, null)
+
+        then:
+        visitor.types.size() == 2
+        visitor.data.size() == 2
     }
 }

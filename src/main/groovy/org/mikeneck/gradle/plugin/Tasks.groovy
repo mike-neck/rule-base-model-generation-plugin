@@ -28,18 +28,16 @@ import static org.mikeneck.gradle.plugin.util.ManagedModelUtil.wellDefined
 
 enum Tasks implements TaskCreator {
 
-    GENERATE_INTERFACE('generateModels'){
+    GENERATE_INTERFACE('generateModels', 'Generates Managed Interface'){
         @Override
         void createTask(ModelMap<Task> tasks, ManagedModel model) {
             tasks.create(getTaskName()) {
                 Project pj = project
-                group = 'Meta Model Generation'
-                description = 'generates Managed Interface'
+                group = ModelGeneration.GROUP_NAME
+                description = getTaskDescription()
                 doLast {
                     // validate model
-                    if(!wellDefined(model)) {
-                        throw new IllegalArgumentException("ManagedModel is not well defined.")
-                    }
+                    validateModel(model)
 
                     // configure variable
                     def modelDef = new ModelDefinition(pj.projectDir, model)
@@ -56,21 +54,58 @@ enum Tasks implements TaskCreator {
             }
         }
     },
-    GENERATE_POJO('generatePojos'){
+    GENERATE_POJO('generatePojos', 'Generates POJO implementing Managed Interface'){
         @Override
         void createTask(ModelMap<Task> tasks, ManagedModel model) {
+            tasks.create(getTaskName()) {
+                // variable configuration
+                Project pj = project
 
+                // task property configuration
+                group = ModelGeneration.GROUP_NAME
+                description = getTaskDescription()
+                dependsOn GENERATE_INTERFACE.getTaskName()
+
+                // task action
+                doLast {
+                    // validate model
+                    validateModel(model)
+
+                    // create model domain object
+                    def modelDef = new ModelDefinition(pj.projectDir, model)
+
+                    // write files
+                    modelDef.findClasses {ClassObject cls ->
+                        !cls.enumType
+                    }.each {ClassObject cls ->
+                        pj.file(cls.pojoFilePath).write(cls.pojoFileContents, 'UTF-8')
+                    }
+                }
+            }
         }
     }
 
-    private String taskName
+    private final String taskName
 
-    Tasks(String taskName) {
+    private final String desc
+
+    Tasks(String taskName, String desc) {
         this.taskName = taskName
+        this.desc = desc
     }
 
     String getTaskName() {
         taskName
+    }
+
+    String getTaskDescription() {
+        desc
+    }
+
+    static void validateModel(ManagedModel model) {
+        if(!wellDefined(model)) {
+            throw new IllegalArgumentException("ManagedModel is not well defined.")
+        }
     }
 
     @Override
