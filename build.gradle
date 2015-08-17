@@ -65,3 +65,7 @@ pluginBundle {
         }
     }
 }
+
+if (file('experimental.gradle').exists()) {
+    apply from: 'experimental.gradle'
+}

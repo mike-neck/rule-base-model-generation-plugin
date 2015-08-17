@@ -27,3 +27,5 @@ out/
 # vim
 *~
 
+# experimental gradle script
+experimental.gradle
