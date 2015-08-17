@@ -43,4 +43,18 @@ class ModelDefinitionSpec extends Specification {
         getModelWithEnum()  | true      | ['Favorite.java']
         getModelWithEnum()  | false     | ['Person.java']
     }
+
+    def eachClassSpec() {
+        when:
+        def md = new ModelDefinition(tmpDir.root, model)
+
+        then:
+        md.eachClasses {ClassObject co ->
+            assert map[co.javaName] == co.entries.size()
+        }
+
+        where:
+        model               | map
+        getModelWithEnum()  | ['Favorite.java': (2 + 1), 'Person.java': (2 + 1) + (2 + 1) + 2]
+    }
 }
