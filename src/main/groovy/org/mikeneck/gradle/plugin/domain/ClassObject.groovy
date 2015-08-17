@@ -156,7 +156,7 @@ class ClassObject {
            |
            |${this.imports.join('\\n')}
            |
-           |public class ${klass.name}Pojo {
+           |public class ${klass.name}Pojo implements ${klass.name} {
            |
            |${this.privateFields.join('\n')}
            |${this.accessorImpl.join('\n')}
