@@ -41,12 +41,21 @@ class ModelDefinition {
         model.packageName
     }
 
+    /**
+     * Collect all type names.
+     * @return - {@link Set} of type names.
+     */
     Set<String> getDefinedTypes() {
         model.classes.collect {
             it.name
         } as Set
     }
 
+    /**
+     * Collect {@code enum} type classes and its value entries.
+     * Return value is {@link Map} whose key is type name and value is its entry values.
+     * @return {@link Map} - key is type name, value is its entry values.
+     */
     Map<String, List<String>> getEnumValues() {
         model.classes.findAll {
             it.type == ClassType.ENUM
@@ -61,10 +70,30 @@ class ModelDefinition {
         }
     }
 
+    /**
+     * Apply {@link Closure} operation to all {@link ClassObject} belongs to the model.
+     * @param closure - operation of {@link ClassObject}.
+     */
     void eachClasses(Closure closure) {
         model.classes.each {
             def obj = new ClassObject(it, this)
             closure.call(obj)
         }
+    }
+
+    /**
+     * Filter classes. {@link ClassObject} will be applied to given {@link Closure}.
+     * @param closure - should take {@link ClassObject} and should return {@code boolean}.
+     * @return - {@code Collection} of {@link ClassObject} which matches given {@link Closure} condition.
+     */
+    Collection<ClassObject> findClasses(Closure<Boolean> closure) {
+        def list = []
+        model.classes.each {
+            def obj = new ClassObject(it, this)
+            if (closure.call(obj)) {
+                list << obj
+            }
+        }
+        return list
     }
 }
