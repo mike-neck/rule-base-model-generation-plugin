@@ -15,6 +15,8 @@
  */
 package org.mikeneck.gradle.plugin
 
+import com.github.javaparser.JavaParser
+import com.github.javaparser.ParseException
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
@@ -132,12 +134,24 @@ class PluginSpec extends Specification {
         result.standardOutput.contains('BUILD SUCCESS')
         result.task(":${ModelGeneration.TASK_NAME}").outcome == TaskOutcome.SUCCESS
 
-        then:
+        when:
         def person = project.root.toPath().resolve("src/main/java/gradle/meta/model/Person.java")
         def favorite = project.root.toPath().resolve('src/main/java/gradle/meta/model/Favorite.java')
 
-        expect:
+        then:
         Files.exists(person)
         Files.exists(favorite)
+
+        when:
+        JavaParser.parse(person.toFile())
+
+        then:
+        notThrown(ParseException)
+
+        when:
+        JavaParser.parse(favorite.toFile())
+
+        then:
+        notThrown(ParseException)
     }
 }
