@@ -20,7 +20,6 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
 import org.mikeneck.gradle.plugin.test.support.TemporaryProject
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import java.nio.file.Files
 
@@ -39,7 +38,7 @@ class PluginSpec extends Specification {
 
     def 'When model is invalid, build will fail.' () {
         given:
-        def script = """|apply plugin: 'rule-base-model-generation-plugin'
+        def script = """|apply plugin: 'org.mikeneck.rule-based-model-generation'
                 |
                 |model {
                 |    metaModel {
@@ -89,7 +88,7 @@ class PluginSpec extends Specification {
 
     def 'When model is valid, build will success'() {
         given:
-        def script = """|apply plugin: 'rule-base-model-generation-plugin'
+        def script = """|apply plugin: 'org.mikeneck.rule-based-model-generation'
                 |
                 |model {
                 |    metaModel {
