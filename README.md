@@ -78,6 +78,12 @@ The `generateModel` task will create 2 interfaces and an enum defined at `src/ma
 * enum `sample.gradle.model.Sex`
 * interface `sample.gradle.model.City`
 
+Tasks
+===
+
+* `generateModel` - generates interface defined by `model{}` block.
+* `generatePojo` - generates POJO which implements generated interface. This task depends on `generateModel`.
+
 Requirement
 ===
 
