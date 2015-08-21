@@ -16,6 +16,7 @@
 package org.mikeneck.gradle.plugin
 
 import groovy.text.SimpleTemplateEngine
+import org.junit.Before
 import org.junit.Test
 
 class TemplateTest {
@@ -23,6 +24,13 @@ class TemplateTest {
     static final String INTERFACE = 'templates/interface-template.txt'
 
     final ClassLoader loader = this.class.classLoader
+
+    SimpleTemplateEngine engine
+
+    @Before
+    void setup() {
+        engine = new SimpleTemplateEngine()
+    }
 
     static Map interfaceType() {
         [packageName: 'org.mikeneck.sample',
@@ -42,9 +50,16 @@ class TemplateTest {
                 ]]
     }
 
+    static Map enumType() {
+        [packageName: 'org.mikeneck.sample',
+                imports: [],
+                enumType: true,
+                name: 'StorageType',
+                entries: ['LOCAL', 'S3', 'DROP_BOX', 'GOOGLE_DRIVE']]
+    }
+
     @Test
     void interfaceTest() {
-        def engine = new SimpleTemplateEngine()
         String text = engine.createTemplate(loader.getResource(INTERFACE)).make(interfaceType()) as String
         assert text == $/|package org.mikeneck.sample;
                        |
@@ -66,11 +81,22 @@ class TemplateTest {
                        |/$.stripMargin()
     }
 
-    static class Model {
-        String packageName
-        List<String> imports
-        boolean enumType
-        String name
-        List<String> entries
+    @Test
+    void enumTest() {
+        def sw = new StringWriter()
+        engine.createTemplate(loader.getResource(INTERFACE)).make(enumType()).writeTo(sw)
+        assert sw.toString() == """\
+                                   |package org.mikeneck.sample;
+                                   |
+                                   |
+                                   |
+                                   |public enum StorageType {
+                                   |
+                                   |    LOCAL,
+                                   |    S3,
+                                   |    DROP_BOX,
+                                   |    GOOGLE_DRIVE
+                                   |}
+                                   |""".stripMargin()
     }
 }
