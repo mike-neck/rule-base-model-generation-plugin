@@ -1,0 +1,8 @@
+package ${packageName};
+
+${imports.join('\n')}${enumType ? '' : '\nimport org.gradle.model.Managed;'}
+${enumType ? '' : '\n@Managed'}
+public ${enumType ? 'enum' : 'interface'} ${name} {
+
+<% print entries.collect {it.trim().size() == 0 ? '' : "    ${it}"}.join(enumType ? ',\n' : '\n') %>
+}
