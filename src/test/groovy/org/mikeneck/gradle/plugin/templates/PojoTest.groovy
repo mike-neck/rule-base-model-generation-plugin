@@ -32,6 +32,52 @@ class PojoTest {
 
     static final String TEMPLATE = 'templates/pojo-template.txt'
 
+    static final String POJO_EXPECTED = """\
+           |package org.mikeneck.sample;
+           |
+           |import org.gradle.model.ModelSet;
+           |import java.io.File;
+           |
+           |public class SamplePojo implements Sample {
+           |
+           |    private String name;
+           |
+           |    private ModelSet<Storage> stores;
+           |
+           |    private File directory;
+           |
+           |    @Override
+           |    public String getName() {
+           |        return name;
+           |    }
+           |
+           |    @Override
+           |    public void setName(String name) {
+           |        this.name = name;
+           |    }
+           |
+           |    @Override
+           |    public ModelSet<Storage> getStores() {
+           |        return stores;
+           |    }
+           |
+           |    public void setStores(ModelSet<Storage> stores) {
+           |        this.Stores = Stores;
+           |    }
+           |
+           |    @Override
+           |    public File getDirectory() {
+           |        return name;
+           |    }
+           |
+           |    @Override
+           |    public void setDirectory(File directory) {
+           |        this.directory = directory;
+           |    }
+           |
+           |}
+           |""".stripMargin()
+
     final ClassLoader loader = this.class.classLoader
 
     SimpleTemplateEngine engine
@@ -45,16 +91,16 @@ class PojoTest {
     }
 
     @Test
-    void test() {
+    void templateTest() {
         def text = engine
                 .createTemplate(loader.getResource(TEMPLATE))
                 .make(model())
                 .writeTo(sw)
                 .toString()
-        println text
+        assert text == POJO_EXPECTED
     }
 
-    private Map model() {
+    private static Map model() {
         [
                 packageName: 'org.mikeneck.sample',
                 imports: [
@@ -96,5 +142,17 @@ class PojoTest {
                            |    }
                            |""".stripMargin()]
         ]
+    }
+
+    @Test
+    void withPojoTemplateClass() {
+        def map = model()
+        def tmp = new PojoTemplate(
+                pkg: map.packageName,
+                imps: map.imports,
+                name: map.name,
+                fields: map.privateFields,
+                accessor: map.accessorImpl)
+        assert tmp.contents == POJO_EXPECTED
     }
 }

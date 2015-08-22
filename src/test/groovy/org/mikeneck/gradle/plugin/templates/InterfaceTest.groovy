@@ -39,6 +39,40 @@ class InterfaceTest {
 
     StringWriter sw
 
+    private static final String IF_EXPECTED = """\
+           |package org.mikeneck.sample;
+           |
+           |import org.gradle.model.ModelMap;
+           |import java.io.File;
+           |import org.gradle.model.Managed;
+           |
+           |@Managed
+           |public interface Sample {
+           |
+           |    String getName();
+           |    void setName(String name);
+           |
+           |    ModelMap<Storage> getStore();
+           |
+           |    File getDirectory();
+           |    void setDirectory(File directory);
+           |}
+           |""".stripMargin()
+
+    private static final String ENUM_EXPECTED = """\
+           |package org.mikeneck.sample;
+           |
+           |
+           |
+           |public enum StorageType {
+           |
+           |    LOCAL,
+           |    S3,
+           |    DROP_BOX,
+           |    GOOGLE_DRIVE
+           |}
+           |""".stripMargin()
+
     @Before
     void setup() {
         engine = new SimpleTemplateEngine()
@@ -78,24 +112,7 @@ class InterfaceTest {
                 .make(interfaceType())
                 .writeTo(sw)
                 .toString()
-        assert text == $/|package org.mikeneck.sample;
-                       |
-                       |import org.gradle.model.ModelMap;
-                       |import java.io.File;
-                       |import org.gradle.model.Managed;
-                       |
-                       |@Managed
-                       |public interface Sample {
-                       |
-                       |    String getName();
-                       |    void setName(String name);
-                       |
-                       |    ModelMap<Storage> getStore();
-                       |
-                       |    File getDirectory();
-                       |    void setDirectory(File directory);
-                       |}
-                       |/$.stripMargin()
+        assert text == IF_EXPECTED
     }
 
     @Test
@@ -103,18 +120,30 @@ class InterfaceTest {
         engine.createTemplate(loader.getResource(INTERFACE))
                 .make(enumType())
                 .writeTo(sw)
-        assert sw.toString() == """\
-                                   |package org.mikeneck.sample;
-                                   |
-                                   |
-                                   |
-                                   |public enum StorageType {
-                                   |
-                                   |    LOCAL,
-                                   |    S3,
-                                   |    DROP_BOX,
-                                   |    GOOGLE_DRIVE
-                                   |}
-                                   |""".stripMargin()
+        assert sw.toString() == ENUM_EXPECTED
+    }
+
+    @Test
+    void interfaceWithTemplateClass() {
+        def map = interfaceType()
+        def tmp = new InterfaceTemplate(
+                pkg: map.packageName,
+                imps: map.imports,
+                isEnum: map.enumType,
+                name: map.name,
+                entries: map.entries)
+        assert tmp.contents == IF_EXPECTED
+    }
+
+    @Test
+    void enumWithTemplateClass() {
+        def map = enumType()
+        def tmp = new InterfaceTemplate(
+                pkg: map.packageName,
+                imps: map.imports,
+                isEnum: map.enumType,
+                name: map.name,
+                entries: map.entries)
+        assert tmp.contents == ENUM_EXPECTED
     }
 }
