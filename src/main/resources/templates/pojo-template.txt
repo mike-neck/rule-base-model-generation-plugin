@@ -1,0 +1,9 @@
+package ${packageName};
+
+${imports.join('\n')}
+
+public class ${name}Pojo implements ${name} {
+
+<% print privateFields.join('\n') %>
+<% print accessorImpl.join('\n') %>
+}

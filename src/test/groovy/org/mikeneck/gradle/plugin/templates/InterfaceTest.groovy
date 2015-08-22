@@ -13,13 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mikeneck.gradle.plugin
+package org.mikeneck.gradle.plugin.templates
 
 import groovy.text.SimpleTemplateEngine
 import org.junit.Before
 import org.junit.Test
 
-class TemplateTest {
+/**
+ * Interface template accepts map with data...
+ * <ul>
+ *     <li>{@code packageName} - {@code String} - the name of package.</li>
+ *     <li>{@code imports} - {@code List<String>} - import classes for this interface with {@code import} statement.</li>
+ *     <li>{@code enumType} - {@code boolean} - whether this interface is enum({@code true}) or interface({@code false}).</li>
+ *     <li>{@code name} - {@code String} - the name of type.</li>
+ *     <li>{@code entries} - {@code List<String>} - enum values or </li>
+ * </ul>
+ */
+class InterfaceTest {
 
     static final String INTERFACE = 'templates/interface-template.txt'
 
@@ -27,9 +37,12 @@ class TemplateTest {
 
     SimpleTemplateEngine engine
 
+    StringWriter sw
+
     @Before
     void setup() {
         engine = new SimpleTemplateEngine()
+        sw = new StringWriter()
     }
 
     static Map interfaceType() {
@@ -60,7 +73,11 @@ class TemplateTest {
 
     @Test
     void interfaceTest() {
-        String text = engine.createTemplate(loader.getResource(INTERFACE)).make(interfaceType()) as String
+        String text = engine
+                .createTemplate(loader.getResource(INTERFACE))
+                .make(interfaceType())
+                .writeTo(sw)
+                .toString()
         assert text == $/|package org.mikeneck.sample;
                        |
                        |import org.gradle.model.ModelMap;
@@ -83,8 +100,9 @@ class TemplateTest {
 
     @Test
     void enumTest() {
-        def sw = new StringWriter()
-        engine.createTemplate(loader.getResource(INTERFACE)).make(enumType()).writeTo(sw)
+        engine.createTemplate(loader.getResource(INTERFACE))
+                .make(enumType())
+                .writeTo(sw)
         assert sw.toString() == """\
                                    |package org.mikeneck.sample;
                                    |
