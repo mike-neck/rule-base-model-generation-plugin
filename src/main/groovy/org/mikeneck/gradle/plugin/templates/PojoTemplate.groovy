@@ -22,10 +22,10 @@ class PojoTemplate extends AbstractTemplate {
     static final String TEMPLATE_NAME = 'templates/pojo-template.txt'
 
     String pkg
-    List<String> imps
+    Collection<String> imps
     String name
-    List<String> fields
-    List<String> accessor
+    Collection<String> fields
+    Collection<String> accessor
 
     @Override
     String getTemplateName() {

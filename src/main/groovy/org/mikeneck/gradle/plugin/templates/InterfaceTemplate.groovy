@@ -22,10 +22,10 @@ class InterfaceTemplate extends AbstractTemplate {
     static final String TEMPLATE_NAME = 'templates/interface-template.txt'
 
     String pkg
-    List<String> imps
+    Collection<String> imps
     boolean isEnum
     String name
-    List<String> entries
+    Collection<String> entries
 
     @Override
     String getTemplateName() {
