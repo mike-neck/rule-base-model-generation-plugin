@@ -24,7 +24,7 @@ ext {
     encoding = 'UTF-8'
 }
 
-version = '0.2.1'
+version = '0.3.0'
 group = 'org.mikeneck.gradle.plugin'
 
 repositories {
@@ -56,7 +56,7 @@ idea {
 pluginBundle {
     website = 'https://github.com/mike-neck/rule-base-model-generation-plugin'
     vcsUrl = 'https://github.com/mike-neck/rule-base-model-generation-plugin'
-    description = 'This is plugin for Gradle, which generates interfaces for rule base model.'
+    description = 'This plugin generates interfaces for rule base model as you defined with model block.'
     plugins {
         ruleBaseModelGeneration {
             id = 'org.mikeneck.rule-based-model-generation'

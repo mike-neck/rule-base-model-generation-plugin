@@ -1,3 +1,11 @@
+version 0.3.0
+===
+
+* Add constructors to generated Pojo.
+  * Default constructor.
+  * Constructor whose arguments is generated managed model object.
+  * Constructor with parameters
+
 Version 0.2.1
 ===
 
