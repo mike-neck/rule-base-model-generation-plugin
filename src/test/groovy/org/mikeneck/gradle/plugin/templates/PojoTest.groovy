@@ -46,6 +46,9 @@ class PojoTest {
            |
            |    private File directory;
            |
+           |    public SamplePojo() {
+           |    }
+           |
            |    @Override
            |    public String getName() {
            |        return name;
@@ -107,6 +110,11 @@ class PojoTest {
                         'import org.gradle.model.ModelSet;',
                         'import java.io.File;'],
                 name: 'Sample',
+                constructors: [
+                        """\
+                           |    public SamplePojo() {
+                           |    }
+                           |""".stripMargin()],
                 privateFields: [
                         '    private String name;\n',
                         '    private ModelSet<Storage> stores;\n',
@@ -151,6 +159,12 @@ class PojoTest {
                 pkg: map.packageName,
                 imps: map.imports,
                 name: map.name,
+                constructors: [
+                        """\
+                           |    public SamplePojo() {
+                           |    }
+                           |""".stripMargin()
+                ],
                 fields: map.privateFields,
                 accessor: map.accessorImpl)
         assert tmp.contents == POJO_EXPECTED

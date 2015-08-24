@@ -208,6 +208,8 @@ class PluginSpec extends Specification {
         then:
         Files.exists(person)
         !Files.exists(favorite)
+        and:
+        println person.toFile().text
 
         when:
         def unit = JavaParser.parse(person.toFile())

@@ -25,6 +25,7 @@ class PojoTemplate extends AbstractTemplate {
     Collection<String> imps
     String name
     Collection<String> fields
+    Collection<String> constructors
     Collection<String> accessor
 
     @Override
@@ -47,6 +48,7 @@ class PojoTemplate extends AbstractTemplate {
                 packageName: pkg,
                 imports: imps,
                 name: name,
+                constructors: constructors,
                 privateFields: fields,
                 accessorImpl: accessor]
     }

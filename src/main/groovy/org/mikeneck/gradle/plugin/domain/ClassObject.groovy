@@ -32,9 +32,16 @@ class ClassObject {
 
     final Set<String> enumValueUsed = [] as Set
 
+    final Collection<FieldObject> fieldObjects
+
     ClassObject(ClassEntry klass, ModelDefinition model) {
         this.klass = klass
         this.model = model
+        this.fieldObjects = klass.type == ClassType.ENUM ?
+                Collections.emptySet():
+                klass.fields.collect {
+                    new FieldObject(it, model.definedTypes)
+                }
     }
 
     /**
@@ -87,6 +94,29 @@ class ClassObject {
                 PropertyEntryUtil.collectImports(klass.fields)
     }
 
+    String getDefaultConstructor() {
+        """\
+           |    public ${klass.name}Pojo() {
+           |    }
+           |""".stripMargin()
+    }
+
+    String getConstructorWithInterface() {
+        """\
+           |    public ${klass.name}Pojo(${klass.name} model) {
+           |${fieldObjects.collect {"        ${it.thisField} = model.${it.getterMethod}();"}.join('\n')}
+           |    }
+           |""".stripMargin()
+    }
+
+    String getConstructorWithParameters() {
+        """\
+           |    public ${klass.name}Pojo(${fieldObjects.collect {it.typeAndName}.join(', ')}) {
+           |${fieldObjects.collect {it.settingToThisField}.join('\n')}
+           |    }
+           |""".stripMargin()
+    }
+
     /**
      * Returns method declarations or enum values.
      * @return Method declarations - when this class is interface. Enum values - if this class is enum.
@@ -94,9 +124,7 @@ class ClassObject {
     List<String> getEntries() {
         isEnumType() ?
                 klass.values.collect { it.value } + [''] :
-                klass.fields.collect {
-                    new FieldObject(it, model.definedTypes)
-                }.collect {
+                fieldObjects.collect {
                     if (it.unableToGenerateAccessors) {
                         throw new IllegalArgumentException(it.exceptionMessage(klass.name))
                     }
@@ -118,9 +146,7 @@ class ClassObject {
     List<String> getAccessorImpl() {
         isEnumType() ?
                 Collections.emptyList() :
-                klass.fields.collect {
-                    new FieldObject(it, model.definedTypes)
-                }.collect {
+                fieldObjects.collect {
                     if (it.unableToGenerateAccessors) {
                         throw new IllegalArgumentException(it.exceptionMessage(klass.name))
                     }
@@ -131,9 +157,7 @@ class ClassObject {
     List<String> getPrivateFields() {
         isEnumType() ?
                 Collections.emptyList():
-                klass.fields.collect {
-                    new FieldObject(it, model.definedTypes)
-                }.collect {
+                fieldObjects.collect {
                     it.field
                 }
     }
@@ -161,6 +185,10 @@ class ClassObject {
                 pkg: model.packageName,
                 imps: this.imports,
                 name: klass.name,
+                constructors: [
+                        this.defaultConstructor,
+                        this.constructorWithInterface,
+                        this.constructorWithParameters],
                 fields: this.privateFields,
                 accessor: this.accessorImpl)
         template.contents

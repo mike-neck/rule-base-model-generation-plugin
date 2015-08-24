@@ -60,13 +60,17 @@ class FieldObject {
         "${entry.name.substring(0, 1).toUpperCase()}${entry.name.substring(1)}"
     }
 
+    String getGetterMethod() {
+        "get${this.camelName}"
+    }
+
     String getGetter() {
-        "${this.typeDeclaration} get${this.camelName}();"
+        "${this.typeDeclaration} ${this.getterMethod}();"
     }
 
     String getPublicGetter() {
         """|    @Override
-           |    public ${this.typeDeclaration} get${this.camelName}() {
+           |    public ${this.typeDeclaration} ${this.getterMethod}() {
            |        return ${entry.name};
            |    }
            |""".stripMargin()
@@ -76,14 +80,26 @@ class FieldObject {
         entry.type.requireSetter()
     }
 
+    String getThisField() {
+        "this.${entry.name}"
+    }
+
+    String getTypeAndName() {
+        "${this.typeDeclaration} ${this.entry.name}"
+    }
+
+    String getSettingToThisField() {
+        "        this.${entry.name} = ${entry.name};"
+    }
+
     String getSetter() {
         "void set${this.camelName}(${this.typeDeclaration} ${entry.name});"
     }
 
     String getPublicSetter() {
         def override = isSetterRequired() ? "    @Override\n" : ''
-        """|${override}    public void set${this.camelName}(${this.typeDeclaration} ${entry.name}) {
-           |        this.${entry.name} = ${entry.name};
+        """|${override}    public void set${this.camelName}(${this.typeAndName}) {
+           |${this.settingToThisField}
            |    }
            |""".stripMargin()
     }
